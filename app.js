@@ -417,10 +417,36 @@ function buildPrintHTML(r) {
   </div>`;
 }
 
+/**
+ * ลดขนาดตัวอักษรของเอกสารอัตโนมัติ ให้เนื้อหาทั้งหมดพอดี 1 หน้า A4
+ * (วัดจริงบนพื้นที่เนื้อหา 186 × 277 มม. ตามค่า @page ใน style.css)
+ */
+const PRINT_FIT = { START_PT: 12, MIN_PT: 7, STEP_PT: 0.25, WIDTH_MM: 186, HEIGHT_MM: 277, SAFETY: 0.96 };
+
+function fitToOnePage() {
+  const area = $('#printArea');
+  const doc = $('.doc', area);
+  if (!doc) return;
+
+  // แสดงนอกจอชั่วคราว ด้วยความกว้างเท่าพื้นที่พิมพ์ เพื่อวัดความสูงจริง
+  area.style.cssText = `display:block;position:absolute;left:-10000px;top:0;visibility:hidden;width:${PRINT_FIT.WIDTH_MM}mm`;
+  const maxH = PRINT_FIT.HEIGHT_MM / 25.4 * 96 * PRINT_FIT.SAFETY;
+
+  let fs = PRINT_FIT.START_PT;
+  doc.style.setProperty('--fs', fs + 'pt');
+  const tooBig = () => doc.scrollHeight > maxH || doc.scrollWidth > doc.clientWidth + 1;
+  while (tooBig() && fs > PRINT_FIT.MIN_PT) {
+    fs -= PRINT_FIT.STEP_PT;
+    doc.style.setProperty('--fs', fs + 'pt');
+  }
+  area.removeAttribute('style');
+  return fs;
+}
+
 function printRecord(r) {
   $('#printArea').innerHTML = buildPrintHTML(r);
-  // รอให้ฟอนต์/เลย์เอาต์พร้อมก่อนเปิดหน้าต่างพิมพ์
-  const go = () => setTimeout(() => window.print(), 150);
+  // รอให้ฟอนต์พร้อม → ปรับขนาดให้พอดี 1 หน้า → เปิดหน้าต่างพิมพ์
+  const go = () => { fitToOnePage(); setTimeout(() => window.print(), 150); };
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(go); else go();
 }
 
