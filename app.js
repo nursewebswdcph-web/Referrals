@@ -5,7 +5,7 @@
    (เว้นว่าง = โหมดทดลอง เก็บข้อมูลในเบราว์เซอร์เครื่องนี้)
    ===================================================== */
 const CONFIG = {
-  API_URL: '',   // เช่น 'https://script.google.com/macros/s/AKfycb.../exec'
+  API_URL: 'https://script.google.com/macros/s/AKfycbwexuhehn3JIEoGAooQ2SM8rzrQxKTrTUlTf4GvvZS0V1ozer8Qz8y1kR4uIbkL1v6Y/exec',   // เช่น 'https://script.google.com/macros/s/AKfycb.../exec'
   MAX_DAYS: 60   // จำนวนวันสูงสุดของการให้ยาต่อเนื่อง
 };
 
