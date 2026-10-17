@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>แบบฟอร์มส่งต่อเพื่อการดูแลต่อเนื่อง | รพร.สว่างแดนดิน</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">+</span>
+      <div>
+        <div class="brand-title">แบบฟอร์มส่งต่อเพื่อการดูแลต่อเนื่อง</div>
+        <div class="brand-sub">โรงพยาบาลสมเด็จพระยุพราชสว่างแดนดิน</div>
+      </div>
+    </div>
+    <div id="modeBadge" class="badge" hidden>โหมดทดลอง (เก็บในเครื่องนี้)</div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ===== หน้าประวัติ ===== -->
+  <section id="viewHistory">
+    <div class="toolbar">
+      <h1>ประวัติการบันทึก</h1>
+      <div class="toolbar-actions">
+        <input id="searchBox" type="search" placeholder="ค้นหา ชื่อ / HN / การวินิจฉัย / ผู้ส่ง">
+        <input id="filterDate" type="date" title="กรองตามวันที่ส่ง">
+        <button id="btnClearFilter" class="btn ghost" type="button">ล้างตัวกรอง</button>
+        <button id="btnAdd" class="btn primary" type="button">+ เพิ่มรายการ</button>
+      </div>
+    </div>
+
+    <div class="card table-card">
+      <div class="table-scroll">
+        <table class="history" id="historyTable">
+          <thead>
+            <tr>
+              <th>วันที่ส่ง</th>
+              <th>ชื่อผู้รับบริการ</th>
+              <th>HN</th>
+              <th>ส่งต่อ</th>
+              <th>การวินิจฉัย</th>
+              <th>การดูแลต่อเนื่อง</th>
+              <th>ผู้ส่ง</th>
+              <th class="col-actions">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+      <div id="emptyState" class="empty" hidden>ยังไม่มีรายการ — กด “+ เพิ่มรายการ” เพื่อเริ่มบันทึก</div>
+    </div>
+    <div id="countInfo" class="muted small"></div>
+  </section>
+
+  <!-- ===== หน้าฟอร์ม ===== -->
+  <section id="viewForm" hidden>
+    <div class="toolbar">
+      <h1 id="formTitle">เพิ่มรายการส่งต่อ</h1>
+      <div class="toolbar-actions">
+        <button class="btn ghost" type="button" data-action="cancel">← กลับหน้าประวัติ</button>
+      </div>
+    </div>
+
+    <form id="referForm" class="card form" autocomplete="off" novalidate>
+
+      <fieldset>
+        <legend>ข้อมูลทั่วไป</legend>
+
+        <div class="grid g3">
+          <label class="field">
+            <span>จากแผนก</span>
+            <input id="dept" type="text" placeholder="เช่น 02 ศัลยกรรม">
+          </label>
+          <label class="field">
+            <span>ตึก</span>
+            <input id="building" type="text" placeholder="เช่น หอสงฆ์อาพาธ">
+          </label>
+          <label class="field">
+            <span>โทรศัพท์ 042-721-111 ต่อ</span>
+            <input id="ext" type="text" inputmode="numeric" placeholder="เช่น 4029">
+          </label>
+        </div>
+
+        <div class="field">
+          <span>ส่งต่อ <em class="hint">(เลือกได้มากกว่า 1)</em></span>
+          <div id="referOptions" class="choices"></div>
+        </div>
+
+        <label class="field">
+          <span>ระบุ (ชื่อ รพ.สต. / รพช. / อื่นๆ)</span>
+          <input id="referOther" type="text" placeholder="เช่น รพ.สต.บงใต้">
+        </label>
+
+        <div class="field">
+          <span>เวลา</span>
+          <div id="timeOptions" class="choices"></div>
+        </div>
+
+        <div class="grid g2">
+          <label class="field">
+            <span>ชื่อผู้รับบริการ <b class="req">*</b></span>
+            <input id="patientName" type="text">
+          </label>
+          <label class="field">
+            <span>HN <b class="req">*</b></span>
+            <input id="hn" type="text" inputmode="numeric">
+          </label>
+        </div>
+
+        <label class="field">
+          <span>ที่อยู่</span>
+          <textarea id="address" rows="2"></textarea>
+        </label>
+
+        <label class="field">
+          <span>การวินิจฉัย <b class="req">*</b></span>
+          <input id="diagnosis" type="text">
+        </label>
+
+        <label class="field">
+          <span>ประเด็นปัญหาที่พบของผู้ป่วยรายนี้</span>
+          <textarea id="problem" rows="3"></textarea>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>ข้อมูลการส่งต่อเพื่อการดูแลต่อเนื่อง</legend>
+        <p class="muted small" style="margin-top:0">ติ๊กเลือกได้มากกว่า 1 รายการ</p>
+        <div id="careList" class="care-list"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>ข้อมูลการนัดพบแพทย์</legend>
+        <div class="choices">
+          <label class="chk"><input type="radio" name="appoint" value="none" checked> ไม่มีนัด</label>
+          <label class="chk"><input type="radio" name="appoint" value="yes"> มีนัด</label>
+        </div>
+        <label class="field" id="appointWrap" hidden>
+          <span>ระบุรายละเอียดการนัด</span>
+          <textarea id="appointDetail" rows="3" placeholder="เช่น 1) คลินิกเบาหวาน ... 2) คลินิกศัลยกรรม ..."></textarea>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>ผู้ส่ง</legend>
+        <div class="grid g3">
+          <label class="field">
+            <span>ลงชื่อผู้ส่ง <b class="req">*</b></span>
+            <input id="senderName" type="text">
+          </label>
+          <label class="field">
+            <span>ตำแหน่ง</span>
+            <input id="senderPosition" type="text" placeholder="เช่น พยาบาลวิชาชีพปฏิบัติการ">
+          </label>
+          <label class="field">
+            <span>วันที่ส่ง (วันที่ปัจจุบัน)</span>
+            <input id="sendDateText" type="text" readonly>
+            <input id="sendDate" type="hidden">
+          </label>
+        </div>
+      </fieldset>
+
+      <div class="form-actions">
+        <button class="btn ghost" type="button" data-action="cancel">ยกเลิก</button>
+        <button class="btn" type="button" id="btnPreview">ดูตัวอย่าง / พิมพ์โดยไม่บันทึก</button>
+        <button class="btn" type="button" id="btnSavePrint">บันทึกและพิมพ์</button>
+        <button class="btn primary" type="submit" id="btnSave">บันทึก</button>
+      </div>
+    </form>
+  </section>
+
+</main>
+
+<!-- พื้นที่พิมพ์เอกสาร (แสดงเฉพาะตอนสั่งพิมพ์) -->
+<div id="printArea"></div>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<div id="loading" class="loading" hidden><div class="spinner"></div><span>กำลังดำเนินการ...</span></div>
+
+<script src="app.js"></script>
+</body>
+</html>
