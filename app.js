@@ -355,9 +355,10 @@ function buildPrintHTML(r) {
     `<span class="opt">${cb(r.timeSlot === t)}${esc(t)}</span>`).join('');
 
   // ---- การดูแลต่อเนื่อง ----
+  // พิมพ์เฉพาะรายการที่เลือก
   let careHTML = '';
-  CARE_ITEMS.forEach(c => {
-    const on = !!care[c.key];
+  CARE_ITEMS.filter(c => !!care[c.key]).forEach(c => {
+    const on = true;
     if (c.key === 'med') {
       careHTML += `<div class="care"><span class="opt">${cb(on)}ให้ยาต่อเนื่อง</span>` +
         (on ? ` &nbsp;ตั้งแต่วันที่ <b>${esc(thaiDate(r.medStart))}</b> ถึงวันที่ <b>${esc(thaiDate(r.medEnd))}</b>` : '') +
@@ -367,6 +368,8 @@ function buildPrintHTML(r) {
         (on && ct[c.key] ? ` : <b>${nl(ct[c.key])}</b>` : '') + `</div>`;
     }
   });
+
+  if (!careHTML) careHTML = '<div class="care">-</div>';
 
   const medSection = care.med
     ? `<div class="sec">บันทึกเวลาการให้ยา (กรณีส่งต่อเพื่อให้ยาต่อเนื่อง)</div>${medTableHTML(r.medStart, r.medEnd)}`
@@ -399,11 +402,11 @@ function buildPrintHTML(r) {
     ${medSection}
     ${appointHTML}
 
-    <div class="sign"><div class="sign-box">
-      <div class="ln"><span>ลงชื่อผู้ส่ง</span>${fill(r.senderName)}</div>
-      <div class="ln"><span>ตำแหน่ง</span>${fill(r.senderPosition)}</div>
-      <div class="ln"><span>วันที่</span>${fill(thaiDate(r.sendDate))}</div>
-    </div></div>
+    <div class="ln sign-ln" style="margin-top:.6em">
+      <span>ลงชื่อผู้ส่ง</span>${fill(r.senderName)}
+      <span>ตำแหน่ง</span>${fill(r.senderPosition)}
+      <span>วันที่</span>${fill(thaiDate(r.sendDate), 'md')}
+    </div>
 
     <div class="footer-sec">
       <div class="title">บันทึกข้อมูลจากสถานพยาบาลใกล้บ้าน ที่ผู้ป่วยไปรับบริการก่อนการรับตรวจตามนัด</div>
@@ -421,7 +424,7 @@ function buildPrintHTML(r) {
  * ลดขนาดตัวอักษรของเอกสารอัตโนมัติ ให้เนื้อหาทั้งหมดพอดี 1 หน้า A4
  * (วัดจริงบนพื้นที่เนื้อหา 186 × 277 มม. ตามค่า @page ใน style.css)
  */
-const PRINT_FIT = { START_PT: 12, MIN_PT: 7, STEP_PT: 0.25, WIDTH_MM: 186, HEIGHT_MM: 277, SAFETY: 0.96 };
+const PRINT_FIT = { START_PT: 10, MIN_PT: 7, STEP_PT: 0.25, WIDTH_MM: 186, HEIGHT_MM: 277, SAFETY: 0.96 };
 
 function fitToOnePage() {
   const area = $('#printArea');
