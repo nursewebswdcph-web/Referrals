@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="modern.css">
 </head>
 <body>
 
@@ -26,168 +27,150 @@
   </div>
 </header>
 
-<main class="wrap">
-
-  <!-- ===== หน้าประวัติ ===== -->
-  <section id="viewHistory">
-    <div class="toolbar">
-      <h1>ประวัติการบันทึก</h1>
-      <div class="toolbar-actions">
-        <input id="searchBox" type="search" placeholder="ค้นหา ชื่อ / HN / การวินิจฉัย / ผู้ส่ง">
-        <input id="filterDate" type="date" title="กรองตามวันที่ส่ง">
-        <button id="btnClearFilter" class="btn ghost" type="button">ล้างตัวกรอง</button>
-        <button id="btnAdd" class="btn primary" type="button">+ เพิ่มรายการ</button>
-      </div>
+<div class="app-shell">
+  <aside class="sidebar" aria-label="เมนูหลัก">
+    <div class="sidebar-caption">เมนูหลัก</div>
+    <button class="side-link active" type="button" data-view="form">
+      <span class="side-icon">＋</span><span>บันทึกส่งต่อ</span>
+    </button>
+    <button class="side-link" type="button" data-view="history">
+      <span class="side-icon">▤</span><span>ประวัติการบันทึก</span>
+    </button>
+    <button class="side-link" type="button" data-view="settings">
+      <span class="side-icon">⚙</span><span>ตั้งค่าข้อมูล</span>
+    </button>
+    <div class="sidebar-foot">
+      <span class="status-dot"></span>
+      <span>ระบบส่งต่อเพื่อการดูแลต่อเนื่อง</span>
     </div>
+  </aside>
 
-    <div class="card table-card">
-      <div class="table-scroll">
-        <table class="history" id="historyTable">
-          <thead>
-            <tr>
-              <th>วันที่ส่ง</th>
-              <th>ชื่อผู้รับบริการ</th>
-              <th>HN</th>
-              <th>ส่งต่อ</th>
-              <th>การวินิจฉัย</th>
-              <th>การดูแลต่อเนื่อง</th>
-              <th>ผู้ส่ง</th>
-              <th class="col-actions">จัดการ</th>
-            </tr>
-          </thead>
-          <tbody id="historyBody"></tbody>
-        </table>
+  <main class="wrap">
+    <!-- ===== หน้าประวัติ ===== -->
+    <section id="viewHistory" hidden>
+      <div class="toolbar">
+        <div><div class="eyebrow">RECORDS</div><h1>ประวัติการบันทึก</h1></div>
+        <div class="toolbar-actions">
+          <input id="searchBox" type="search" placeholder="ค้นหา ชื่อ / HN / การวินิจฉัย / ผู้ส่ง">
+          <input id="filterDate" type="date" title="กรองตามวันที่ส่ง">
+          <button id="btnClearFilter" class="btn ghost" type="button">ล้างตัวกรอง</button>
+          <button id="btnAdd" class="btn primary" type="button">＋ เพิ่มรายการ</button>
+        </div>
       </div>
-      <div id="emptyState" class="empty" hidden>ยังไม่มีรายการ — กด “+ เพิ่มรายการ” เพื่อเริ่มบันทึก</div>
-    </div>
-    <div id="countInfo" class="muted small"></div>
-  </section>
-
-  <!-- ===== หน้าฟอร์ม ===== -->
-  <section id="viewForm" hidden>
-    <div class="toolbar">
-      <h1 id="formTitle">เพิ่มรายการส่งต่อ</h1>
-      <div class="toolbar-actions">
-        <button class="btn ghost" type="button" data-action="cancel">← กลับหน้าประวัติ</button>
+      <div class="card table-card">
+        <div class="table-scroll">
+          <table class="history" id="historyTable">
+            <thead><tr><th>วันที่ส่ง</th><th>ชื่อผู้รับบริการ</th><th>HN</th><th>ส่งต่อ</th><th>การวินิจฉัย</th><th>การดูแลต่อเนื่อง</th><th>ผู้ส่ง</th><th class="col-actions">จัดการ</th></tr></thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+        <div id="emptyState" class="empty" hidden>ยังไม่มีรายการ</div>
       </div>
-    </div>
+      <div id="countInfo" class="muted small"></div>
+    </section>
 
-    <form id="referForm" class="card form" autocomplete="off" novalidate>
-
-      <fieldset>
-        <legend>ข้อมูลทั่วไป</legend>
-
-        <div class="grid g3">
-          <label class="field">
-            <span>จากแผนก</span>
-            <input id="dept" type="text" placeholder="เช่น 02 ศัลยกรรม">
-          </label>
-          <label class="field">
-            <span>ตึก</span>
-            <input id="building" type="text" placeholder="เช่น หอสงฆ์อาพาธ">
-          </label>
-          <label class="field">
-            <span>โทรศัพท์ 042-721-111 ต่อ</span>
-            <input id="ext" type="text" inputmode="numeric" placeholder="เช่น 4029">
-          </label>
-        </div>
-
-        <div class="field">
-          <span>ส่งต่อ <em class="hint">(เลือกได้มากกว่า 1)</em></span>
-          <div id="referOptions" class="choices"></div>
-        </div>
-
-        <label class="field">
-          <span>ระบุ (ชื่อ รพ.สต. / รพช. / อื่นๆ)</span>
-          <input id="referOther" type="text" placeholder="เช่น รพ.สต.บงใต้">
-        </label>
-
-        <div class="field">
-          <span>เวลา</span>
-          <div id="timeOptions" class="choices"></div>
-        </div>
-
-        <div class="grid g2">
-          <label class="field">
-            <span>ชื่อผู้รับบริการ <b class="req">*</b></span>
-            <input id="patientName" type="text">
-          </label>
-          <label class="field">
-            <span>HN <b class="req">*</b></span>
-            <input id="hn" type="text" inputmode="numeric">
-          </label>
-        </div>
-
-        <label class="field">
-          <span>ที่อยู่</span>
-          <textarea id="address" rows="2"></textarea>
-        </label>
-
-        <label class="field">
-          <span>การวินิจฉัย <b class="req">*</b></span>
-          <input id="diagnosis" type="text">
-        </label>
-
-        <label class="field">
-          <span>ประเด็นปัญหาที่พบของผู้ป่วยรายนี้</span>
-          <textarea id="problem" rows="3"></textarea>
-        </label>
-      </fieldset>
-
-      <fieldset>
-        <legend>ข้อมูลการส่งต่อเพื่อการดูแลต่อเนื่อง</legend>
-        <p class="muted small" style="margin-top:0">ติ๊กเลือกได้มากกว่า 1 รายการ</p>
-        <div id="careList" class="care-list"></div>
-      </fieldset>
-
-      <fieldset>
-        <legend>ข้อมูลการนัดพบแพทย์</legend>
-        <div class="choices">
-          <label class="chk"><input type="radio" name="appoint" value="none" checked> ไม่มีนัด</label>
-          <label class="chk"><input type="radio" name="appoint" value="yes"> มีนัด</label>
-        </div>
-        <label class="field" id="appointWrap" hidden>
-          <span>ระบุรายละเอียดการนัด</span>
-          <textarea id="appointDetail" rows="3" placeholder="เช่น 1) คลินิกเบาหวาน ... 2) คลินิกศัลยกรรม ..."></textarea>
-        </label>
-      </fieldset>
-
-      <fieldset>
-        <legend>ผู้ส่ง</legend>
-        <div class="grid g3">
-          <label class="field">
-            <span>ลงชื่อผู้ส่ง <b class="req">*</b></span>
-            <input id="senderName" type="text">
-          </label>
-          <label class="field">
-            <span>ตำแหน่ง</span>
-            <input id="senderPosition" type="text" placeholder="เช่น พยาบาลวิชาชีพปฏิบัติการ">
-          </label>
-          <label class="field">
-            <span>วันที่ส่ง (วันที่ปัจจุบัน)</span>
-            <input id="sendDateText" type="text" readonly>
-            <input id="sendDate" type="hidden">
-          </label>
-        </div>
-      </fieldset>
-
-      <div class="form-actions">
-        <button class="btn ghost" type="button" data-action="cancel">ยกเลิก</button>
-        <button class="btn" type="button" id="btnPreview">ดูตัวอย่าง / พิมพ์โดยไม่บันทึก</button>
-        <button class="btn" type="button" id="btnSavePrint">บันทึกและพิมพ์</button>
-        <button class="btn primary" type="submit" id="btnSave">บันทึก</button>
+    <!-- ===== หน้าฟอร์ม ===== -->
+    <section id="viewForm">
+      <div class="toolbar">
+        <div><div class="eyebrow">NEW REFERRAL</div><h1 id="formTitle">บันทึกส่งต่อเพื่อการดูแลต่อเนื่อง</h1></div>
+        <div class="toolbar-actions"><span class="form-hint">กรอกข้อมูลให้ครบถ้วนก่อนบันทึก</span></div>
       </div>
-    </form>
-  </section>
+      <form id="referForm" class="card form" autocomplete="off" novalidate>
+        <fieldset>
+          <legend>ข้อมูลทั่วไป</legend>
+          <div class="grid g3">
+            <label class="field"><span>จากแผนก</span><input id="dept" type="text" list="deptSuggestions" placeholder="ค้นหาหรือเลือกแผนก"></label>
+            <label class="field"><span>ตึก / หอผู้ป่วย</span><input id="building" type="text" list="buildingSuggestions" placeholder="ค้นหาหรือเลือกตึก"></label>
+            <label class="field"><span>โทรศัพท์ 042-721-111 ต่อ</span><input id="ext" type="text" inputmode="numeric" list="extSuggestions" placeholder="เบอร์โทรศัพท์ภายใน"></label>
+          </div>
+          <div class="field">
+            <span>ส่งต่อ <em class="hint">(เลือกได้มากกว่า 1)</em></span>
+            <div id="referOptions" class="choices"></div>
+          </div>
+          <label class="field"><span>ระบุ (ชื่อ รพ.สต. / รพช. / อื่นๆ)</span><input id="referOther" type="text" placeholder="เช่น รพ.สต.บงใต้"></label>
+          <div class="field"><span>เวลา</span><div id="timeOptions" class="choices"></div></div>
+          <div class="grid g2">
+            <label class="field"><span>ชื่อผู้รับบริการ <b class="req">*</b></span><input id="patientName" type="text"></label>
+            <label class="field"><span>HN <b class="req">*</b></span><input id="hn" type="text" inputmode="numeric"></label>
+          </div>
+          <label class="field"><span>ที่อยู่</span><textarea id="address" rows="2"></textarea></label>
+          <label class="field"><span>การวินิจฉัย <b class="req">*</b></span><input id="diagnosis" type="text"></label>
+          <label class="field"><span>ประเด็นปัญหาที่พบของผู้ป่วยรายนี้</span><textarea id="problem" rows="3"></textarea></label>
+        </fieldset>
+        <fieldset>
+          <legend>ข้อมูลการส่งต่อเพื่อการดูแลต่อเนื่อง</legend>
+          <p class="muted small" style="margin-top:0">ติ๊กเลือกได้มากกว่า 1 รายการ</p>
+          <div id="careList" class="care-list"></div>
+        </fieldset>
+        <fieldset>
+          <legend>ข้อมูลการนัดพบแพทย์</legend>
+          <div class="choices">
+            <label class="chk"><input type="radio" name="appoint" value="none" checked> ไม่มีนัด</label>
+            <label class="chk"><input type="radio" name="appoint" value="yes"> มีนัด</label>
+          </div>
+          <label class="field" id="appointWrap" hidden><span>ระบุรายละเอียดการนัด</span><textarea id="appointDetail" rows="3" placeholder="เช่น 1) คลินิกเบาหวาน ... 2) คลินิกศัลยกรรม ..."></textarea></label>
+        </fieldset>
+        <fieldset>
+          <legend>ผู้ส่ง</legend>
+          <div class="grid g3">
+            <label class="field"><span>ลงชื่อผู้ส่ง <b class="req">*</b></span><input id="senderName" type="text" list="staffSuggestions" placeholder="ค้นหาหรือเลือกชื่อเจ้าหน้าที่"></label>
+            <label class="field"><span>ตำแหน่ง</span><input id="senderPosition" type="text" list="positionSuggestions" placeholder="เช่น พยาบาลวิชาชีพปฏิบัติการ"></label>
+            <label class="field"><span>วันที่ส่ง (วันที่ปัจจุบัน)</span><input id="sendDateText" type="text" readonly><input id="sendDate" type="hidden"></label>
+          </div>
+        </fieldset>
+        <div class="form-actions">
+          <button class="btn ghost" type="button" data-action="cancel">ยกเลิก</button>
+          <button class="btn" type="button" id="btnPreview">ดูตัวอย่าง / พิมพ์โดยไม่บันทึก</button>
+          <button class="btn" type="button" id="btnSavePrint">บันทึกและพิมพ์</button>
+          <button class="btn primary" type="submit" id="btnSave">บันทึกข้อมูลส่งต่อ</button>
+        </div>
+      </form>
+    </section>
 
-</main>
+    <!-- ===== หน้าตั้งค่า ===== -->
+    <section id="viewSettings" hidden>
+      <div class="toolbar">
+        <div><div class="eyebrow">QUICK SETTINGS</div><h1>ตั้งค่าข้อมูลเรียกใช้</h1><p class="muted settings-intro">บันทึกข้อมูลที่ใช้บ่อย แล้วค้นหาหรือเลือกใช้ได้ทันทีในแบบฟอร์ม</p></div>
+      </div>
+      <div class="settings-grid">
+        <article class="card setting-card">
+          <div class="setting-head"><div class="setting-symbol">01</div><div><h2>แผนก</h2><p>รายการแผนกต้นทาง</p></div></div>
+          <form id="deptSettingForm" class="setting-entry"><input id="deptSettingInput" type="text" placeholder="พิมพ์ชื่อแผนก" required><button class="btn primary" type="submit">เพิ่ม</button></form>
+          <div id="deptSettingList" class="setting-list"></div>
+        </article>
+        <article class="card setting-card">
+          <div class="setting-head"><div class="setting-symbol">02</div><div><h2>ตึก / หอผู้ป่วย</h2><p>ชื่อหน่วยงานและเบอร์โทรศัพท์ภายใน</p></div></div>
+          <form id="buildingSettingForm" class="setting-entry stacked"><input id="buildingSettingName" type="text" placeholder="ชื่อตึก / หอผู้ป่วย" required><input id="buildingSettingExt" type="text" placeholder="เบอร์โทรศัพท์ภายใน"><button class="btn primary" type="submit">เพิ่มรายการ</button></form>
+          <div id="buildingSettingList" class="setting-list"></div>
+        </article>
+        <article class="card setting-card setting-wide">
+          <div class="setting-head"><div class="setting-symbol">03</div><div><h2>ชื่อยาและวิธีที่ให้</h2><p>บันทึกข้อความยาที่ใช้บ่อย สามารถแก้ไขข้อความได้หลังเลือกใช้</p></div></div>
+          <form id="medSettingForm" class="setting-entry stacked"><textarea id="medSettingInput" rows="2" placeholder="เช่น Ceftriaxone 2 g IV วันละครั้ง" required></textarea><button class="btn primary" type="submit">เพิ่มรายการยา</button></form>
+          <div id="medSettingList" class="setting-list"></div>
+        </article>
+        <article class="card setting-card setting-wide">
+          <div class="setting-head"><div class="setting-symbol">04</div><div><h2>ชื่อเจ้าหน้าที่และตำแหน่ง</h2><p>เลือกชื่อแล้วเติมตำแหน่งให้อัตโนมัติ</p></div></div>
+          <form id="staffSettingForm" class="setting-entry stacked"><input id="staffSettingName" type="text" placeholder="ชื่อ-สกุลเจ้าหน้าที่" required><input id="staffSettingPosition" type="text" placeholder="ตำแหน่ง"><button class="btn primary" type="submit">เพิ่มเจ้าหน้าที่</button></form>
+          <div id="staffSettingList" class="setting-list"></div>
+        </article>
+      </div>
+      <p class="settings-note">ข้อมูลตั้งค่าเก็บไว้ในเบราว์เซอร์และอุปกรณ์ที่ใช้งานนี้ ไม่กระทบข้อมูลประวัติการส่งต่อใน Google Sheets</p>
+    </section>
+  </main>
+</div>
 
-<!-- พื้นที่พิมพ์เอกสาร (แสดงเฉพาะตอนสั่งพิมพ์) -->
+<datalist id="deptSuggestions"></datalist>
+<datalist id="buildingSuggestions"></datalist>
+<datalist id="extSuggestions"></datalist>
+<datalist id="medSuggestions"></datalist>
+<datalist id="staffSuggestions"></datalist>
+<datalist id="positionSuggestions"></datalist>
+
 <div id="printArea"></div>
-
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 <div id="loading" class="loading" hidden><div class="spinner"></div><span>กำลังดำเนินการ...</span></div>
 
 <script src="app.js"></script>
+<script src="ui.js"></script>
 </body>
 </html>
