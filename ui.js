@@ -112,6 +112,7 @@
       else showView(v);
     }));
     // ให้หน้าแรกเป็นแบบฟอร์มบันทึกทันที ไม่ต้องผ่านหน้าประวัติ
+    if (typeof showForm === 'function' && typeof blankRecord === 'function') showForm(blankRecord(), 'บันทึกส่งต่อเพื่อการดูแลต่อเนื่อง');
     showView('form');
     setDefaults();
   });
