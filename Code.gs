@@ -39,9 +39,11 @@ function doPost(e) {
   try {
     lock.waitLock(20000);
     switch (p.action) {
-      case 'list':   return json_({ ok: true, records: listRecords_() });
-      case 'save':   return json_({ ok: true, record: saveRecord_(p.record) });
-      case 'delete': deleteRecord_(p.id); return json_({ ok: true });
+      case 'list':         return json_({ ok: true, records: listRecords_() });
+      case 'save':         return json_({ ok: true, record: saveRecord_(p.record) });
+      case 'delete':       deleteRecord_(p.id); return json_({ ok: true });
+      case 'getSettings':  return json_({ ok: true, settings: getSettings_() });
+      case 'saveSettings': saveSettings_(p.settings); return json_({ ok: true, settings: getSettings_() });
       default:       return json_({ ok: false, error: 'ไม่รู้จักคำสั่ง: ' + p.action });
     }
   } catch (err) {
@@ -142,4 +144,79 @@ function deleteRecord_(id) {
   if (rowNo < 0) throw new Error('ไม่พบรายการที่ต้องการลบ');
   // ลบแบบ soft delete — ข้อมูลยังอยู่ในชีต (status = deleted)
   sh.getRange(rowNo, HEADERS.indexOf('status') + 1).setValue('deleted');
+}
+
+
+// ---------- การตั้งค่าข้อมูลส่วนกลาง ----------
+const SETTINGS_SHEET_NAME = 'ReferralSettings';
+const SETTINGS_HEADERS = ['key', 'json', 'updatedAt'];
+
+function settingsSheet_() {
+  const ss = SHEET_ID ? SpreadsheetApp.openById(SHEET_ID) : SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName(SETTINGS_SHEET_NAME);
+  if (!sh) {
+    sh = ss.insertSheet(SETTINGS_SHEET_NAME);
+    sh.getRange(1, 1, 1, SETTINGS_HEADERS.length)
+      .setValues([SETTINGS_HEADERS])
+      .setFontWeight('bold')
+      .setBackground('#e6f0ed');
+    sh.setFrozenRows(1);
+    sh.getRange(1, 1, sh.getMaxRows(), SETTINGS_HEADERS.length).setNumberFormat('@');
+  }
+  return sh;
+}
+
+function normalizeSettings_(settings) {
+  const source = settings || {};
+  const cleanArray = (value, fields) => {
+    if (!Array.isArray(value)) return [];
+    return value.map(item => {
+      const out = {};
+      fields.forEach(field => {
+        const v = item && item[field] != null ? String(item[field]).trim() : '';
+        out[field] = v;
+      });
+      if (!out.id) out.id = 'q' + Utilities.getUuid().replace(/-/g, '').slice(0, 12);
+      return out;
+    }).filter(item => fields.some(field => field !== 'id' && item[field]));
+  };
+  return {
+    departments: cleanArray(source.departments, ['id', 'value']),
+    buildings: cleanArray(source.buildings, ['id', 'name', 'ext']),
+    medicines: cleanArray(source.medicines, ['id', 'value']),
+    staff: cleanArray(source.staff, ['id', 'name', 'position'])
+  };
+}
+
+function getSettings_() {
+  const sh = settingsSheet_();
+  const last = sh.getLastRow();
+  if (last < 2) return normalizeSettings_({});
+  const rows = sh.getRange(2, 1, last - 1, SETTINGS_HEADERS.length).getValues();
+  for (let i = rows.length - 1; i >= 0; i--) {
+    if (String(rows[i][0]) === 'shared') {
+      try { return normalizeSettings_(JSON.parse(rows[i][1] || '{}')); }
+      catch (err) { throw new Error('ข้อมูลตั้งค่าส่วนกลางเสียหาย: ' + err.message); }
+    }
+  }
+  return normalizeSettings_({});
+}
+
+function saveSettings_(settings) {
+  if (!settings || typeof settings !== 'object') throw new Error('ไม่พบข้อมูลตั้งค่าที่ต้องการบันทึก');
+  const sh = settingsSheet_();
+  const normalized = normalizeSettings_(settings);
+  const payload = JSON.stringify(normalized);
+  const last = sh.getLastRow();
+  let rowNo = -1;
+  if (last >= 2) {
+    const keys = sh.getRange(2, 1, last - 1, 1).getValues();
+    for (let i = 0; i < keys.length; i++) {
+      if (String(keys[i][0]) === 'shared') { rowNo = i + 2; break; }
+    }
+  }
+  if (rowNo < 0) rowNo = sh.getLastRow() + 1;
+  sh.getRange(rowNo, 1, 1, SETTINGS_HEADERS.length)
+    .setNumberFormat('@')
+    .setValues([['shared', payload, nowISO_()]]);
 }
